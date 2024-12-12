@@ -5,6 +5,11 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src /app/src
+# Create necessary directories
+RUN mkdir -p /app/src/templates
+
+# Copy source code and templates
+COPY src/main.py /app/src/
+COPY src/templates/* /app/src/templates/
 
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

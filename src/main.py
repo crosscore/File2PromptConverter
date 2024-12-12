@@ -1,15 +1,24 @@
 # File2PromptConverter/src/main.py
 import io
 import mimetypes
+import os
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import HTMLResponse, PlainTextResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from typing import List
 
 app = FastAPI()
 
+# Get the absolute path to the templates directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+templates_dir = os.path.join(BASE_DIR, "templates")
+
+# Create templates directory if it doesn't exist
+os.makedirs(templates_dir, exist_ok=True)
+
 # Jinja2テンプレートの設定
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=templates_dir)
 
 @app.get("/", response_class=HTMLResponse)
 async def get_form(request: Request):
@@ -51,3 +60,7 @@ def decode_content(content: bytes, filename: str) -> str:
     else:
         # MIMEタイプが不明な場合
         return "Error: Unknown file type"
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
