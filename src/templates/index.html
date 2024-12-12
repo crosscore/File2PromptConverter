@@ -3,12 +3,29 @@
 <html>
 <head>
     <title>File Uploader</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>File Upload</h1>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="files" multiple>
-        <button type="submit">Upload</button>
-    </form>
+    <div class="container">
+        <h1>File Upload</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="files" id="fileInput" multiple onchange="displayFileNames()">
+            <button type="submit">Upload</button>
+        </form>
+        <div id="uploaded-files"></div>
+    </div>
+
+    <script>
+        function displayFileNames() {
+            const fileInput = document.getElementById('fileInput');
+            const uploadedFilesDiv = document.getElementById('uploaded-files');
+            uploadedFilesDiv.innerHTML = '';
+
+            if (fileInput.files.length > 0) {
+                const fileNames = Array.from(fileInput.files).map(file => file.name).join(', ');
+                uploadedFilesDiv.textContent = 'Uploaded files: ' + fileNames;
+            }
+        }
+    </script>
 </body>
 </html>

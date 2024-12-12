@@ -3,20 +3,23 @@
 <html>
 <head>
   <title>File Upload Result</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>File Upload Result</h1>
-  <textarea id="resultText" rows="20" cols="100">{{ result_text }}</textarea>
-  <br>
-  <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    <div class="container">
+        <h1>File Upload Result</h1>
+        <textarea id="resultText" rows="20">{{ result_text }}</textarea>
+        <br>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
 
-  <script>
-    function copyToClipboard() {
-      var copyText = document.getElementById("resultText");
-      copyText.select();
-      document.execCommand("copy");
-      alert("Copied to clipboard!");
-    }
-  </script>
+    <script>
+        function copyToClipboard() {
+            var copyText = document.getElementById("resultText");
+            copyText.select();
+            document.execCommand("copy");
+            alert("Copied to clipboard!");
+        }
+    </script>
 </body>
 </html>
