@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Upload Result</title>
+</head>
+<body>
+  <h1>File Upload Result</h1>
+  <textarea id="resultText" rows="20" cols="100">{{ result_text }}</textarea>
+  <br>
+  <button onclick="copyToClipboard()">Copy to Clipboard</button>
+
+  <script>
+    function copyToClipboard() {
+      var copyText = document.getElementById("resultText");
+      copyText.select();
+      document.execCommand("copy");
+      alert("Copied to clipboard!");
+    }
+  </script>
+</body>
+</html>
