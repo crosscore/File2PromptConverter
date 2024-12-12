@@ -1,5 +1,4 @@
 # File2PromptConverter/src/main.py
-import io
 import mimetypes
 import os
 from fastapi import FastAPI, File, UploadFile, Request
@@ -32,8 +31,8 @@ async def upload_files(request: Request, files: List[UploadFile] = File(...)):
     for file in files:
         content = await file.read()
         decoded_content = decode_content(content, file.filename)
-        contents.append(f"```{file.filename}\n{decoded_content}\n```")
-    result_text = "\n".join(contents)
+        contents.append(f"--- START OF FILE {file.filename} ---\n{decoded_content}\n--- END OF FILE {file.filename} ---")
+    result_text = "\n\n".join(contents)
     return templates.TemplateResponse("result.html", {"request": request, "result_text": result_text})
 
 def decode_content(content: bytes, filename: str) -> str:
