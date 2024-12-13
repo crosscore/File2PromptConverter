@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from typing import List
 
 app = FastAPI()
-app.mount("/templates", StaticFiles(directory="src/templates"), name="templates")
+app.mount("/", StaticFiles(directory="src/templates", html=True), name="static")
 
 # Get the absolute path to the templates directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
