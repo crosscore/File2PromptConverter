@@ -52,7 +52,7 @@ def decode_content(content: bytes, filename: str) -> str:
                 encoding = chardet.detect(content)["encoding"]
                 return content.decode(encoding)
             except (ImportError, UnicodeDecodeError):
-                # chardetがない場合や、文字コードの推定に失敗した場合は、エラーメッセージを返す
+                # chardetがない場合や、文字コードの推定に失敗した場合、エラーを返す
                 return f"Error: Could not decode file with unknown encoding."
     elif mime_type:
         # バイナリファイルの場合
