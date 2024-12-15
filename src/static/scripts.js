@@ -51,10 +51,12 @@ async function handleFileUpload(event) {
 }
 
 // Clipboard Handler
-function copyToClipboard() {
-  elements.resultText.select();
-  document.execCommand("copy");
-  alert("Copied to clipboard!");
+async function copyToClipboard() {
+  try {
+    await navigator.clipboard.writeText(elements.resultText.value);
+  } catch (err) {
+    console.error('Failed to copy text: ', err);
+  }
 }
 
 // Form Reset Handler
