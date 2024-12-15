@@ -1,6 +1,4 @@
 # src/main.py
-
-import mimetypes
 import os
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import HTMLResponse, PlainTextResponse
@@ -8,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
+from utils.file_processor import FileProcessor
 
 app = FastAPI()
 
@@ -47,31 +46,17 @@ async def upload_files(files: List[UploadFile] = File(...)):
         contents = []
         for file in files:
             content = await file.read()
-            decoded_content = decode_content(content, file.filename)
-            contents.append(f"--- START OF FILE {file.filename} ---\n{decoded_content}\n--- END OF FILE {file.filename} ---")
+            decoded_content = content.decode('utf-8')
+            formatted_content = FileProcessor.format_file_content(
+                file.filename,
+                decoded_content
+            )
+            contents.append(formatted_content)
+
         result_text = "\n\n".join(contents)
         return PlainTextResponse(result_text)
     except Exception as e:
         return PlainTextResponse(f"Error processing files: {str(e)}", status_code=500)
-
-def decode_content(content: bytes, filename: str) -> str:
-    """ファイルの内容を適切なエンコーディングでデコードする"""
-    mime_type, _ = mimetypes.guess_type(filename)
-
-    if mime_type and mime_type.startswith("text"):
-        try:
-            return content.decode("utf-8")
-        except UnicodeDecodeError:
-            try:
-                import chardet
-                encoding = chardet.detect(content)["encoding"]
-                return content.decode(encoding or 'utf-8')
-            except (ImportError, UnicodeDecodeError):
-                return f"Error: Could not decode file with unknown encoding."
-    elif mime_type:
-        return f"Binary file of type: {mime_type}"
-    else:
-        return "Error: Unknown file type"
 
 if __name__ == "__main__":
     import uvicorn
