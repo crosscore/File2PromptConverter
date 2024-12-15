@@ -1,14 +1,13 @@
-<!-- File2PromptConverter/src/templates/index.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <title>File Uploader</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
         <h1>File Upload</h1>
-        <form id="upload-form" onsubmit="uploadFiles(event)">
+        <form id="upload-form" enctype="multipart/form-data">
             <input type="file" name="files" id="fileInput" multiple onchange="displayFileNames()">
             <button type="submit">Upload</button>
         </form>
@@ -28,42 +27,41 @@
 
             if (fileInput.files.length > 0) {
                 const fileNames = Array.from(fileInput.files).map(file => file.name).join(', ');
-                uploadedFilesDiv.textContent = fileNames;
+                uploadedFilesDiv.textContent = 'Selected files: ' + fileNames;
             }
         }
 
-        async function uploadFiles(event) {
-          event.preventDefault(); // デフォルトのフォーム送信を防止
-            const form = document.getElementById('upload-form');
-            const fileInput = document.getElementById('fileInput');
-            const formData = new FormData(form);
+        document.getElementById('upload-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
 
-            if (fileInput.files.length === 0) {
-                alert("Please select at least one file.");
-                return;
+            const formData = new FormData();
+            const fileInput = document.getElementById('fileInput');
+
+            for (const file of fileInput.files) {
+                formData.append('files', file);
             }
 
             try {
                 const response = await fetch('/upload', {
                     method: 'POST',
-                    body: formData,
+                    body: formData
                 });
 
-                if (response.ok) {
-                    const resultText = await response.text();
-                    document.getElementById('resultText').value = resultText;
-                    document.getElementById('result-container').style.display = 'block';
-                } else {
-                    alert('Error uploading files.');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+
+                const resultText = await response.text();
+                document.getElementById('resultText').value = resultText;
+                document.getElementById('result-container').style.display = 'block';
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred during the upload.');
+                alert('Error uploading files: ' + error.message);
             }
-        }
+        });
 
         function copyToClipboard() {
-            var copyText = document.getElementById("resultText");
+            const copyText = document.getElementById("resultText");
             copyText.select();
             document.execCommand("copy");
             alert("Copied to clipboard!");
