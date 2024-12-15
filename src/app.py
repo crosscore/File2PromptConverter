@@ -1,18 +1,11 @@
-# src/main.py
+# src/app.py
 import os
-import sys
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import HTMLResponse, PlainTextResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
-
-# Add the src directory to the Python path
-src_dir = os.path.dirname(os.path.abspath(__file__))
-if src_dir not in sys.path:
-    sys.path.append(src_dir)
-
 from utils.file_processor import FileProcessor
 
 app = FastAPI()
