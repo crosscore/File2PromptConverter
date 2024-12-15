@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
-from utils.file_processor import FileProcessor
+from src.utils.file_processor import FileProcessor
 
 app = FastAPI()
 
