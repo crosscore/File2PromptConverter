@@ -8,11 +8,16 @@
 <body>
     <div class="container">
         <h1>File Upload</h1>
-        <form action="/upload" method="post" enctype="multipart/form-data">
+        <form id="upload-form" onsubmit="uploadFiles(event)">
             <input type="file" name="files" id="fileInput" multiple onchange="displayFileNames()">
             <button type="submit">Upload</button>
         </form>
         <div id="uploaded-files"></div>
+        <div id="result-container" style="display: none;">
+            <h2>Result</h2>
+            <textarea id="resultText" rows="20"></textarea><br>
+            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+        </div>
     </div>
 
     <script>
@@ -25,6 +30,43 @@
                 const fileNames = Array.from(fileInput.files).map(file => file.name).join(', ');
                 uploadedFilesDiv.textContent = fileNames;
             }
+        }
+
+        async function uploadFiles(event) {
+          event.preventDefault(); // デフォルトのフォーム送信を防止
+            const form = document.getElementById('upload-form');
+            const fileInput = document.getElementById('fileInput');
+            const formData = new FormData(form);
+
+            if (fileInput.files.length === 0) {
+                alert("Please select at least one file.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const resultText = await response.text();
+                    document.getElementById('resultText').value = resultText;
+                    document.getElementById('result-container').style.display = 'block';
+                } else {
+                    alert('Error uploading files.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during the upload.');
+            }
+        }
+
+        function copyToClipboard() {
+            var copyText = document.getElementById("resultText");
+            copyText.select();
+            document.execCommand("copy");
+            alert("Copied to clipboard!");
         }
     </script>
 </body>

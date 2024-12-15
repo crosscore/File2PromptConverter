@@ -29,7 +29,7 @@ async def get_form(request: Request):
     """ファイルアップロードフォームを表示する"""
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.post("/upload", response_class=HTMLResponse)
+@app.post("/upload")
 async def upload_files(files: List[UploadFile] = File(...)):
     """複数のファイルをアップロードし、テキスト化して返す"""
     contents = []
@@ -38,7 +38,7 @@ async def upload_files(files: List[UploadFile] = File(...)):
         decoded_content = decode_content(content, file.filename)
         contents.append(f"--- START OF FILE {file.filename} ---\n{decoded_content}\n--- END OF FILE {file.filename} ---")
     result_text = "\n\n".join(contents)
-    return templates.TemplateResponse("result.html", {"request": Request, "result_text": result_text})
+    return PlainTextResponse(result_text)
 
 def decode_content(content: bytes, filename: str) -> str:
     """ファイルの内容を適切なエンコーディングでデコードする"""
