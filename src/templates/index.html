@@ -1,3 +1,5 @@
+<!--File2PromptConverter/src/templates/index.html-->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,64 +10,19 @@
     <div class="container">
         <h1>File Upload</h1>
         <form id="upload-form" enctype="multipart/form-data">
-            <input type="file" name="files" id="fileInput" multiple onchange="displayFileNames()">
+            <input type="file" name="files" id="fileInput" multiple>
             <button type="submit">Upload</button>
         </form>
         <div id="uploaded-files"></div>
         <div id="result-container" style="display: none;">
             <h2>Result</h2>
             <textarea id="resultText" rows="20"></textarea><br>
-            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+            <div class="button-group">
+                <button onclick="copyToClipboard()">Copy to Clipboard</button>
+                <button onclick="resetForm()" class="reset-button">Reset</button>
+            </div>
         </div>
     </div>
-
-    <script>
-        function displayFileNames() {
-            const fileInput = document.getElementById('fileInput');
-            const uploadedFilesDiv = document.getElementById('uploaded-files');
-            uploadedFilesDiv.innerHTML = '';
-
-            if (fileInput.files.length > 0) {
-                const fileNames = Array.from(fileInput.files).map(file => file.name).join(', ');
-                uploadedFilesDiv.textContent = 'Selected files: ' + fileNames;
-            }
-        }
-
-        document.getElementById('upload-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            const formData = new FormData();
-            const fileInput = document.getElementById('fileInput');
-
-            for (const file of fileInput.files) {
-                formData.append('files', file);
-            }
-
-            try {
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const resultText = await response.text();
-                document.getElementById('resultText').value = resultText;
-                document.getElementById('result-container').style.display = 'block';
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error uploading files: ' + error.message);
-            }
-        });
-
-        function copyToClipboard() {
-            const copyText = document.getElementById("resultText");
-            copyText.select();
-            document.execCommand("copy");
-            alert("Copied to clipboard!");
-        }
-    </script>
+    <script src="/static/scripts.js"></script>
 </body>
 </html>

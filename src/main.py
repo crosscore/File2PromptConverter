@@ -1,3 +1,5 @@
+# src/main.py
+
 import mimetypes
 import os
 from fastapi import FastAPI, File, UploadFile, Request
@@ -9,7 +11,7 @@ from typing import List
 
 app = FastAPI()
 
-# CORSミドルウェアの設定を追加
+# CORSミドルウェアの設定
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,13 +20,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 静的ファイルとテンプレートの設定を修正
+# ベースディレクトリとテンプレートディレクトリの設定
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 templates_dir = os.path.join(BASE_DIR, "templates")
-os.makedirs(templates_dir, exist_ok=True)
+static_dir = os.path.join(BASE_DIR, "static")
 
-# 静的ファイルのマウント位置を修正
-app.mount("/static", StaticFiles(directory=templates_dir), name="static")
+# ディレクトリが存在しない場合は作成
+os.makedirs(templates_dir, exist_ok=True)
+os.makedirs(static_dir, exist_ok=True)
+
+# 静的ファイルのマウント
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Jinja2テンプレートの設定
 templates = Jinja2Templates(directory=templates_dir)
