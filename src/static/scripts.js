@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
   elements.fileInput.addEventListener('change', displayFileNames);
 });
 
-// トースト表示用の関数を追加
+// トースト表示用の関数
 function showToast(duration = 2400) {
   elements.toast.style.display = 'block';
   // 表示アニメーションのため少し待つ
