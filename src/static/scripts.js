@@ -6,7 +6,8 @@ const elements = {
   fileInput: document.getElementById('fileInput'),
   uploadedFiles: document.getElementById('uploaded-files'),
   resultContainer: document.getElementById('result-container'),
-  resultText: document.getElementById('resultText')
+  resultText: document.getElementById('resultText'),
+  toast: document.getElementById('toast')
 };
 
 // File Display Handler
@@ -53,9 +54,18 @@ async function handleFileUpload(event) {
 // Clipboard Handler
 async function copyToClipboard() {
   try {
-    await navigator.clipboard.writeText(elements.resultText.value);
+    elements.resultText.select();
+    const success = document.execCommand('copy');
+    if (!success) {
+      throw new Error('copy command failed');
+    }
+    showToast(); // 成功時にトーストを表示
   } catch (err) {
     console.error('Failed to copy text: ', err);
+    elements.toast.style.backgroundColor = '#d32f2f';
+    elements.toast.textContent = 'コピーに失敗しました';
+    showToast();
+    elements.toast.style.backgroundColor = '#333'; // 色を元に戻す
   }
 }
 
@@ -72,3 +82,19 @@ document.addEventListener('DOMContentLoaded', () => {
   elements.form.addEventListener('submit', handleFileUpload);
   elements.fileInput.addEventListener('change', displayFileNames);
 });
+
+// トースト表示用の関数を追加
+function showToast(duration = 2400) {
+  elements.toast.style.display = 'block';
+  // 表示アニメーションのため少し待つ
+  setTimeout(() => {
+    elements.toast.classList.add('show');
+  }, 10);
+
+  setTimeout(() => {
+    elements.toast.classList.remove('show');
+    setTimeout(() => {
+      elements.toast.style.display = 'none';
+    }, 300);
+  }, duration);
+}
