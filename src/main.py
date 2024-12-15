@@ -20,6 +20,10 @@ os.makedirs(templates_dir, exist_ok=True)
 # Jinja2テンプレートの設定
 templates = Jinja2Templates(directory=templates_dir)
 
+@app.post("/test_post")
+async def test_post():
+    return {"message": "POST request received"}
+
 @app.get("/", response_class=HTMLResponse)
 async def get_form(request: Request):
     """ファイルアップロードフォームを表示する"""
