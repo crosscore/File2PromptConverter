@@ -1,10 +1,12 @@
-// File2PromptConverter/src/templates/scripts.js
+// File2PromptConverter/src/static/scripts.js
 
 // DOM Elements
 const elements = {
-  form: document.getElementById('upload-form'),
   fileInput: document.getElementById('fileInput'),
-  uploadedFiles: document.getElementById('uploaded-files'),
+  dropArea: document.getElementById('dropArea'),
+  selectedFilesList: document.getElementById('selected-files-list'),
+  uploadBtn: document.getElementById('uploadBtn'),
+  resetBtn: document.getElementById('resetBtn'),
   resultContainer: document.getElementById('result-container'),
   resultText: document.getElementById('resultText'),
   toast: document.getElementById('toast'),
@@ -12,6 +14,119 @@ const elements = {
   deleteAllBtn: document.getElementById('deleteAllBtn'),
   confirmDialog: document.getElementById('confirmDialog')
 };
+
+// 選択されたファイルを保持するSet
+const selectedFiles = new Set();
+
+// ファイル入力トリガー
+function triggerFileInput() {
+  elements.fileInput.click();
+}
+
+// ファイルの追加処理
+function addFiles(files) {
+  for (const file of files) {
+      selectedFiles.add(file);
+  }
+  updateFilesList();
+  updateButtonStates();
+}
+
+// ファイルの削除処理
+function removeFile(fileName) {
+  for (const file of selectedFiles) {
+      if (file.name === fileName) {
+          selectedFiles.delete(file);
+          break;
+      }
+  }
+  updateFilesList();
+  updateButtonStates();
+}
+
+// ファイルリストの更新
+function updateFilesList() {
+  elements.selectedFilesList.innerHTML = '';
+
+  for (const file of selectedFiles) {
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-item';
+      fileItem.innerHTML = `
+          <span class="file-name">${file.name}</span>
+          <button class="remove-file" onclick="removeFile('${file.name}')">&times;</button>
+      `;
+      elements.selectedFilesList.appendChild(fileItem);
+  }
+}
+
+// ボタンの状態更新
+function updateButtonStates() {
+  const hasFiles = selectedFiles.size > 0;
+  const hasResult = elements.resultContainer.style.display !== 'none';
+
+  // アップロードボタンはファイルがある時のみ有効
+  elements.uploadBtn.disabled = !hasFiles;
+
+  // リセットボタンは結果表示があれば常に有効
+  elements.resetBtn.disabled = (!hasFiles && !hasResult);
+}
+
+// ファイルの全削除
+function resetFiles() {
+  selectedFiles.clear();
+  elements.fileInput.value = '';
+  updateFilesList();
+  updateButtonStates();
+  elements.resultContainer.style.display = 'none';
+}
+
+// ファイルアップロード処理
+async function handleUpload() {
+  const formData = new FormData();
+  for (const file of selectedFiles) {
+      formData.append('files', file);
+  }
+
+  try {
+      const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      const resultText = await response.text();
+      elements.resultText.value = resultText;
+      elements.resultContainer.style.display = 'block';
+  } catch (error) {
+      console.error('Error:', error);
+      showToast('Error uploading files: ' + error.message, 'error');
+  }
+}
+
+// ドラッグ&ドロップイベントハンドラ
+function handleDragOver(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  elements.dropArea.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  elements.dropArea.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  elements.dropArea.classList.remove('drag-over');
+
+  const dt = e.dataTransfer;
+  const files = dt.files;
+
+  addFiles(files);
+}
 
 // 履歴の読み込みと表示
 async function loadHistory() {
@@ -88,6 +203,35 @@ async function deleteHistoryItem(id) {
   }
 }
 
+// コンテンツの保存
+async function saveContent() {
+  if (!selectedFiles.size) {
+      showToast('No files to save', 'error');
+      return;
+  }
+
+  const formData = new FormData();
+  for (const file of selectedFiles) {
+      formData.append('files', file);
+  }
+
+  try {
+      const response = await fetch('/save', {
+          method: 'POST',
+          body: formData
+      });
+
+      if (!response.ok) throw new Error('Failed to save data');
+
+      const result = await response.json();
+      await loadHistory(); // 履歴を再読み込み
+      showToast('Data saved successfully');
+  } catch (error) {
+      console.error('Error saving data:', error);
+      showToast('Failed to save data', 'error');
+  }
+}
+
 // 全履歴削除の確認ダイアログを表示
 function showDeleteAllDialog() {
   elements.confirmDialog.style.display = 'flex';
@@ -113,73 +257,6 @@ function closeDialog() {
   elements.confirmDialog.style.display = 'none';
 }
 
-// コンテンツの保存
-async function saveContent() {
-  if (!elements.resultText.value) {
-      showToast('No content to save', 'error');
-      return;
-  }
-
-  const formData = new FormData();
-  for (const file of elements.fileInput.files) {
-      formData.append('files', file);
-  }
-
-  try {
-      const response = await fetch('/save', {
-          method: 'POST',
-          body: formData
-      });
-
-      if (!response.ok) throw new Error('Failed to save data');
-
-      const result = await response.json();
-      await loadHistory(); // 履歴を再読み込み
-      showToast('Data saved successfully');
-  } catch (error) {
-      console.error('Error saving data:', error);
-      showToast('Failed to save data', 'error');
-  }
-}
-
-// File Display Handler
-function displayFileNames() {
-  elements.uploadedFiles.innerHTML = '';
-
-  if (elements.fileInput.files.length > 0) {
-      const fileNames = Array.from(elements.fileInput.files)
-          .map(file => file.name)
-          .join(', ');
-      elements.uploadedFiles.textContent = 'Selected files: ' + fileNames;
-  }
-}
-
-// File Upload Handler
-async function handleFileUpload(event) {
-  event.preventDefault();
-
-  const formData = new FormData();
-  for (const file of elements.fileInput.files) {
-      formData.append('files', file);
-  }
-
-  try {
-      const response = await fetch('/upload', {
-          method: 'POST',
-          body: formData
-      });
-
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-      const resultText = await response.text();
-      elements.resultText.value = resultText;
-      elements.resultContainer.style.display = 'block';
-  } catch (error) {
-      console.error('Error:', error);
-      showToast('Error uploading files: ' + error.message, 'error');
-  }
-}
-
 // クリップボードにコピー
 async function copyToClipboard() {
   try {
@@ -189,14 +266,6 @@ async function copyToClipboard() {
       console.error('Failed to copy text: ', err);
       showToast('Failed to copy text', 'error');
   }
-}
-
-// フォームのリセット
-function resetForm() {
-  elements.fileInput.value = '';
-  elements.uploadedFiles.innerHTML = '';
-  elements.resultText.value = '';
-  elements.resultContainer.style.display = 'none';
 }
 
 // トースト表示
@@ -219,8 +288,17 @@ function showToast(message, type = 'success', duration = 2400) {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-  elements.form.addEventListener('submit', handleFileUpload);
-  elements.fileInput.addEventListener('change', displayFileNames);
+  // ドラッグ&ドロップイベント
+  elements.dropArea.addEventListener('dragover', handleDragOver);
+  elements.dropArea.addEventListener('dragleave', handleDragLeave);
+  elements.dropArea.addEventListener('drop', handleDrop);
+
+  // ファイル選択イベント
+  elements.fileInput.addEventListener('change', (e) => {
+      addFiles(e.target.files);
+  });
+
+  // 履歴関連
   elements.deleteAllBtn.addEventListener('click', showDeleteAllDialog);
-  loadHistory(); // 初期読み込み
+  loadHistory();
 });

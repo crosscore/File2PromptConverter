@@ -22,21 +22,26 @@
         </div>
 
         <!-- 右側：メインコンテンツ -->
-        <div class="content-panel">
-            <h1>File Upload</h1>
-            <form id="upload-form" enctype="multipart/form-data">
-                <input type="file" name="files" id="fileInput" multiple>
-                <button type="submit">Upload</button>
-            </form>
-            <div id="uploaded-files"></div>
-            <div id="result-container" style="display: none;">
-                <h2>Result</h2>
-                <textarea id="resultText" rows="20"></textarea><br>
-                <div class="button-group">
-                    <button onclick="copyToClipboard()">Copy to Clipboard</button>
-                    <button onclick="saveContent()" class="save-button">Save</button>
-                    <button onclick="resetForm()" class="reset-button">Reset</button>
-                </div>
+        <div class="file-drop-area" id="dropArea">
+            <p>ドラッグ＆ドロップでファイルを追加</p>
+            <p>または</p>
+            <input type="file" id="fileInput" multiple class="hidden-file-input">
+            <button type="button" onclick="triggerFileInput()" class="select-files-btn">ファイルを選択</button>
+        </div>
+
+        <div class="selected-files-list" id="selected-files-list"></div>
+
+        <div class="file-actions">
+            <button type="button" onclick="handleUpload()" id="uploadBtn" disabled>Upload</button>
+            <button type="button" onclick="resetFiles()" id="resetBtn" disabled>Reset</button>
+        </div>
+
+        <div id="result-container" style="display: none;">
+            <h2>Result</h2>
+            <textarea id="resultText" rows="20"></textarea>
+            <div class="button-group">
+                <button type="button" onclick="copyToClipboard()">Copy to Clipboard</button>
+                <button type="button" onclick="saveContent()" class="save-button">Save</button>
             </div>
         </div>
     </div>

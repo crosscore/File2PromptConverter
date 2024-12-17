@@ -182,3 +182,70 @@ textarea {
 .toast.show {
     opacity: 1;
 }
+
+/* ドラッグ&ドロップエリア */
+.file-drop-area {
+    border: 2px dashed #666;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    background-color: #444;
+    margin-bottom: 20px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.file-drop-area.drag-over {
+    background-color: #555;
+    border-color: #008CBA;
+}
+
+.file-drop-area p {
+    margin: 0 0 10px 0;
+    color: #aaa;
+}
+
+/* ファイルリスト */
+.selected-files-list {
+    margin: 15px 0;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #444;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+.file-item .file-name {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.file-item .remove-file {
+    background-color: transparent;
+    color: #ff4444;
+    padding: 4px 8px;
+    margin: 0;
+    font-size: 1.2em;
+    border: none;
+    cursor: pointer;
+}
+
+.file-item .remove-file:hover {
+    color: #ff6666;
+}
+
+/* アクションボタン */
+.file-actions {
+    margin: 15px 0;
+    display: flex;
+    gap: 10px;
+}
+
+/* ファイル入力を非表示 */
+.hidden-file-input {
+    display: none;
+}
