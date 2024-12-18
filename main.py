@@ -1,4 +1,4 @@
-# main.py
+# File2PromptConverter/main.py
 from src.app import app
 
 if __name__ == "__main__":
